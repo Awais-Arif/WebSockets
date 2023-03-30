@@ -5,7 +5,6 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { PostCreateComponent } from './posts/post-create/post-create.component';
 import { HeaderComponent } from './header/header/header.component';
-import { PostListComponent } from './posts/post-list/post-list.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -23,8 +22,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
   declarations: [
     AppComponent,
     PostCreateComponent,
-    HeaderComponent,
-    PostListComponent
+    HeaderComponent
   ],
   imports: [
     BrowserModule,

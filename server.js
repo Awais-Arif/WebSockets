@@ -1,15 +1,83 @@
-// const http = require('http');
-// const app = require('./Backend/app')
-// const port = process.env.PORT || 3000;
-// const server = http.createServer(app);
-// server.listen(port);
+
+var app = require('./backend/app');
+var debug = require('debug')('angular2-nodejs:server');
+var http = require('http');
+
+/**
+ * Get port from environment and store in Express.
+ */
+
+var port = normalizePort(process.env.PORT || '3000');
+app.set('port', port);
+
+/**
+ * Create HTTP server.
+ */
+
+var server = http.createServer(app);
+
+app.get('/', (req, res) => res.send('hello!'));
+
+// var io = require('socket.io').listen(server);
+const io = require('socket.io')(server, {
+  cors: {
+    origin: "http://localhost:4200",
+    methods: ["GET", "POST"]
+  }
+});
+
+io.on('connection', (socket) => {
+  console.log('a user connected');
+  socket.on('message', (data) => {
+    socket.broadcast.emit('message-broadcast', data);
+  });
+});
 
 
-const app = require("./backend/app");
-const debug = require("debug")("node-angular");
-const http = require("http");
+// io.on('connection', (socket) => {
 
-const normalizePort = val => {
+//   console.log('new connection made.');
+
+//   socket.on('join', function (data) {
+//     //joining
+//     socket.join(data.room);
+
+//     console.log(data.user + 'joined the room : ' + data.room);
+
+//     socket.broadcast.to(data.room).emit('new user joined', { user: data.user, message: 'has joined this room.' });
+//   });
+
+
+//   socket.on('leave', function (data) {
+
+//     console.log(data.user + 'left the room : ' + data.room);
+
+//     socket.broadcast.to(data.room).emit('left room', { user: data.user, message: 'has left this room.' });
+
+//     socket.leave(data.room);
+//   });
+
+//   socket.on('message', function (data) {
+
+//     io.in(data.room).emit('new message', { user: data.user, message: data.message });
+//   })
+// });
+
+/**
+ * Listen on provided port, on all network interfaces.
+ */
+
+server.listen(port, () => {
+
+});
+// server.on('error', onError);
+// server.on('listening', onListening);
+
+/**
+ * Normalize a port into a number, string, or false.
+ */
+
+function normalizePort(val) {
   var port = parseInt(val, 10);
 
   if (isNaN(port)) {
@@ -23,37 +91,45 @@ const normalizePort = val => {
   }
 
   return false;
-};
+}
 
-const onError = error => {
-  if (error.syscall !== "listen") {
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error) {
+  if (error.syscall !== 'listen') {
     throw error;
   }
-  const bind = typeof port === "string" ? "pipe " + port : "port " + port;
+
+  var bind = typeof port === 'string'
+    ? 'Pipe ' + port
+    : 'Port ' + port;
+
+  // handle specific listen errors with friendly messages
   switch (error.code) {
-    case "EACCES":
-      console.error(bind + " requires elevated privileges");
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
       process.exit(1);
       break;
-    case "EADDRINUSE":
-      console.error(bind + " is already in use");
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
       process.exit(1);
       break;
     default:
       throw error;
   }
-};
+}
 
-const onListening = () => {
-  const addr = server.address();
-  const bind = typeof port === "string" ? "pipe " + port : "port " + port;
-  debug("Listening on " + bind);
-};
+/**
+ * Event listener for HTTP server "listening" event.
+ */
 
-const port = normalizePort(process.env.PORT || "3000");
-app.set("port", port);
+function onListening() {
+  var addr = server.address();
+  var bind = typeof addr === 'string'
+    ? 'pipe ' + addr
+    : 'port ' + addr.port;
+  debug('Listening on ' + bind);
+}
 
-const server = http.createServer(app);
-server.on("error", onError);
-server.on("listening", onListening);
-server.listen(port);
